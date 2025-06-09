@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack - Home</title>
+    <link rel="stylesheet" href="./styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>FinTrack</h1>
+        <nav>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="expenses.html">Expenses</a></li>
+            <li><a href="budget.html">Budget</a></li>
+          </ul>
+        </nav>
+    </header>
+    <main>
+        <!-- Hero Section Start -->
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Take Control of Your Finances</h2>
+                <p>
+                    FinTrack empowers you to track expenses, set budgets, monitor your spending, and stay updated with the latest financial news and currency exchange rates—all in one place.
+                </p>
+                <a href="expenses.html" class="cta-btn">Get Started</a>
+            </div>
+        </section>
+        <!-- Hero Section End -->
+
+        <section id="overview">
+            <h2>Website Features</h2>
+            <ul>
+                <li>Log and categorize your expenses</li>
+                <li>Visualize spending with charts</li>
+                <li>Set and monitor budgets</li>
+                <li>Get real-time currency exchange rates</li>
+                <li>Read the latest financial market news</li>
+            </ul>
+        </section>
+
+        <section id="finance-news">
+            <h2>Latest Financial News</h2>
+            <div id="news"></div>
+        </section>
+
+        <section id="exchange-rates">
+            <h2>Currency Exchange Rates</h2>
+            <select id="currency-select"></select>
+            <div id="rates"></div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 FinTrack. All rights reserved.</p>
+    </footer>
+    <script type="module" src="scripts/financeNews.js"></script>
+    <script type="module" src="scripts/exchangeRates.js"></script>
+</body>
+</html>
