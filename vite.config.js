@@ -5,13 +5,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'FinTrack-Frontend/index.html'),
-        expenses: resolve(__dirname, 'FinTrack-Frontend/expenses.html'),
-        budget: resolve(__dirname, 'FinTrack-Frontend/budget.html')
+        main: resolve(__dirname, 'src/index.html'),
+        expenses: resolve(__dirname, 'src/expenses.html'),
+        budget: resolve(__dirname, 'src/budget.html')
       }
     }
   },
   server: {
-    open: '/FinTrack-Frontend/index.html'
+    open: '/src/index.html'
   }
 });

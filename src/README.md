@@ -5,7 +5,7 @@ FinTrack is a web-based application designed to help users track their expenses,
 ## Project Structure
 
 ```
-FinTrack-Frontend
+src
 ├── index.html         # Main entry point for the application
 ├── styles             # Contains CSS styles for the application
 │   └── main.css       # Stylesheet defining layout, colors, and typography
@@ -38,7 +38,7 @@ FinTrack-Frontend
    ```
 2. Navigate to the project directory:
    ```
-   cd FinTrack-Frontend
+   cd src
    ```
 3. Open `index.html` in a web browser to view the application.
 
