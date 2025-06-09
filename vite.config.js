@@ -2,10 +2,10 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  root: "src/",
+  root: ".",
   base: "/",
   build: {
-     outDir: "../dist",
+    outDir: "dist",
     emptyOutDir: true,
     rollupOptions: {
       input: {
@@ -14,6 +14,5 @@ export default defineConfig({
         budget: resolve(__dirname, 'src/budget.html')
       }
     }
-  },
- 
+  }
 });
