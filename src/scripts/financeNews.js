@@ -31,7 +31,7 @@ function renderNews(articles) {
     <ul class="news-list">
      ${articles.map(article => `
     <li class="news-item">
-      <a href="${article.url}" target="_blank" rel="noopener">
+      <a href="${article.link}" target="_blank" rel="noopener">
         <strong>${article.title}</strong>
       </a>
       <p>${article.summary || ''}</p>
