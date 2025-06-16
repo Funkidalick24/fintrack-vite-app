@@ -10,7 +10,8 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'src/index.html'),
         expenses: resolve(__dirname, 'src/expenses.html'),
-        budget: resolve(__dirname, 'src/budget.html')
+        budget: resolve(__dirname, 'src/budget.html'),
+        news: resolve(__dirname, 'src/news.html')
       }
     }
   }
