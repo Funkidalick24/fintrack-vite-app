@@ -1,86 +1,12 @@
-import { setBudget, trackExpense } from './budget.js';
+import { budgetStorage, expenseStorage, dateUtils } from './utils.js';
 
-// Expense page logic using localStorage
-
-function getAllExpenses() {
-    return JSON.parse(localStorage.getItem('expenses') || '{}');
-}
-
-function getMonthKeys() {
-    return Object.keys(getAllExpenses()).sort().reverse();
-}
-
-function getExpenses(monthKey) {
-    const all = getAllExpenses();
-    return all[monthKey] || [];
-}
-
-function saveExpenses(monthKey, expenses) {
-    const all = getAllExpenses();
-    all[monthKey] = expenses;
-    localStorage.setItem('expenses', JSON.stringify(all));
-}
-
-function getBudget() {
-    return Number(localStorage.getItem('budget') || 0);
-}
-
-function getCurrentMonthKey() {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-}
-
-function getEarliestMonthKey() {
-    const keys = getMonthKeys();
-    if (keys.length === 0) return getCurrentMonthKey();
-    return keys[keys.length - 1];
-}
-
-function getMonthRange(startKey, endKey) {
-    const result = [];
-    let [startYear, startMonth] = startKey.split('-').map(Number);
-    const [endYear, endMonth] = endKey.split('-').map(Number);
-
-    while (startYear < endYear || (startYear === endYear && startMonth <= endMonth)) {
-        result.push(`${startYear}-${String(startMonth).padStart(2, '0')}`);
-        startMonth++;
-        if (startMonth > 12) {
-            startMonth = 1;
-            startYear++;
-        }
-    }
-    return result;
-}
-
-// Populate month dropdown
-function populateMonthDropdown() {
-    const select = document.getElementById('month-select');
-    const keys = getMonthKeys();
-    const current = getCurrentMonthKey();
-    select.innerHTML = '';
-    keys.forEach(key => {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = new Date(key + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
-        select.appendChild(option);
-    });
-    // Add current month if not present
-    if (!keys.includes(current)) {
-        const option = document.createElement('option');
-        option.value = current;
-        option.textContent = new Date(current + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
-        select.insertBefore(option, select.firstChild);
-    }
-    select.value = current;
-}
-
-let selectedMonth = getCurrentMonthKey();
-
+// Remove the duplicate storage functions and use the imported ones instead
 function renderExpenses() {
-    const expenses = getExpenses(selectedMonth);
+    const expenses = expenseStorage.getMonthlyExpenses(selectedMonth);
     const tbody = document.getElementById('expenses-list');
     tbody.innerHTML = '';
     let total = 0;
+    
     expenses.forEach((exp, idx) => {
         total += Number(exp.amount);
         const tr = document.createElement('tr');
@@ -93,53 +19,99 @@ function renderExpenses() {
         `;
         tbody.appendChild(tr);
     });
-    // Update budget balance
-    const budget = getBudget();
-    const balance = budget - total;
-    const balanceElem = document.getElementById('balance-amount');
-    balanceElem.textContent = `$${balance.toFixed(2)}`;
-    balanceElem.className = balance < 0 ? 'negative' : 'positive';
-    // Update current month label
-    document.getElementById('current-month').textContent =
-        new Date(selectedMonth + '-01').toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    updateBudgetDisplay();
 }
 
+function updateBudgetDisplay() {
+    const fullBudget = budgetStorage.getBudget();
+    
+    // Update full budget display
+    const fullBudgetElement = document.getElementById('full-budget-amount');
+    if (fullBudgetElement) {
+        fullBudgetElement.textContent = `$${fullBudget.toFixed(2)}`;
+    }
+
+    // Calculate total expenses for current month
+    const expenses = expenseStorage.getMonthlyExpenses(selectedMonth);
+    const totalExpenses = expenses.reduce((sum, expense) => 
+        sum + parseFloat(expense.amount), 0);
+
+    // Update remaining balance
+    const remainingBalance = fullBudget - totalExpenses;
+    const balanceElement = document.getElementById('balance-amount');
+    if (balanceElement) {
+        balanceElement.textContent = `$${remainingBalance.toFixed(2)}`;
+        
+        // Color coding for balance
+        balanceElement.style.color = 
+            remainingBalance < 0 ? '#dc3545' : 
+            remainingBalance === 0 ? '#ffc107' : '#28a745';
+    }
+}
+
+let selectedMonth = dateUtils.getCurrentMonthKey();
+
+// Update form submission handler
 document.getElementById('expense-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const amount = document.getElementById('amount').value;
     const category = document.getElementById('category').value;
     const date = document.getElementById('date').value;
     const description = document.getElementById('description').value;
+    
     if (!amount || !category || !date) return;
-    const expenses = getExpenses(selectedMonth);
+    
+    const expenses = expenseStorage.getMonthlyExpenses(selectedMonth);
     expenses.push({ amount, category, date, description });
-    saveExpenses(selectedMonth, expenses);
-    trackExpense(amount); // <-- Use the imported function
+    expenseStorage.saveExpenses(selectedMonth, expenses);
+    
     renderExpenses();
     this.reset();
     document.getElementById('category').selectedIndex = 0;
 });
 
-document.getElementById('expenses-list').addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-btn')) {
-        const idx = e.target.getAttribute('data-idx');
-        const expenses = getExpenses(selectedMonth);
-        expenses.splice(idx, 1);
-        saveExpenses(selectedMonth, expenses);
-        renderExpenses();
+function populateMonthDropdown() {
+    const monthSelect = document.getElementById('month-select');
+    if (!monthSelect) return;
+
+    // Clear existing options
+    monthSelect.innerHTML = '';
+
+    // Get current date
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    // Create options for the last 12 months
+    for (let i = 0; i < 12; i++) {
+        const date = new Date(currentYear, currentMonth - i, 1);
+        const monthKey = date.toISOString().slice(0, 7); // Format: YYYY-MM
+        const monthName = date.toLocaleString('default', { 
+            month: 'long', 
+            year: 'numeric' 
+        });
+
+        const option = document.createElement('option');
+        option.value = monthKey;
+        option.textContent = monthName;
+        monthSelect.appendChild(option);
     }
-});
 
-document.getElementById('month-select').addEventListener('change', function() {
-    selectedMonth = this.value;
+    // Set current month as default
+    monthSelect.value = selectedMonth;
+}
+
+// Make sure this event listener is at the bottom of the file
+document.addEventListener('DOMContentLoaded', () => {
+    populateMonthDropdown();
     renderExpenses();
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Set max date for date input to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').setAttribute('max', today);
 });
 
-populateMonthDropdown();
-renderExpenses();
+// Add month change event listener
+document.getElementById('month-select').addEventListener('change', (e) => {
+    selectedMonth = e.target.value;
+    renderExpenses();
+});

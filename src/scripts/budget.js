@@ -1,11 +1,12 @@
+import { budgetStorage } from './utils.js';
 
-
-const budgetLimits = {};
+let budgetLimits = budgetStorage.getBudgetLimits();
 const expenseTracker = [];
 
 // Function to set budget limit for a category
 function setBudget(category, limit) {
     budgetLimits[category] = limit;
+    budgetStorage.setBudgetLimits(budgetLimits);
     updateBudgetDisplay();
 }
 
@@ -41,14 +42,17 @@ function saveBudgetItems(items) {
     localStorage.setItem('budgetItems', JSON.stringify(items));
 }
 function renderBudget() {
-    const items = getBudgetItems();
+    const items = budgetStorage.getBudgetItems();
     const tbody = document.getElementById('budget-list');
-    if (!tbody) return; // Prevent error if element doesn't exist
+    if (!tbody) return;
+    
     tbody.innerHTML = '';
     let balance = 0;
+    
     items.forEach((item, idx) => {
         if (item.type === 'income') balance += Number(item.amount);
         else balance -= Number(item.amount);
+        
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="text-transform:capitalize;">${item.type}</td>
@@ -58,13 +62,18 @@ function renderBudget() {
         `;
         tbody.appendChild(tr);
     });
+
     const balanceElem = document.getElementById('expected-balance-amount');
     if (balanceElem) {
         balanceElem.textContent = `$${balance.toFixed(2)}`;
         balanceElem.className = balance < 0 ? 'negative' : 'positive';
     }
+
+    // Update the full budget in storage
+    budgetStorage.setBudget(Math.max(0, balance));
 }
 
+// Update form event listener
 const budgetForm = document.getElementById('budget-form');
 if (budgetForm) {
     budgetForm.addEventListener('submit', function(e) {
@@ -72,31 +81,36 @@ if (budgetForm) {
         const type = document.getElementById('type').value;
         const amount = document.getElementById('amount').value;
         const description = document.getElementById('description').value;
+        
         if (!type || !amount) return;
-        const items = getBudgetItems();
+        
+        const items = budgetStorage.getBudgetItems();
         items.push({ type, amount, description });
-        saveBudgetItems(items);
+        budgetStorage.saveBudgetItems(items);
         renderBudget();
+        
         this.reset();
         document.getElementById('type').selectedIndex = 0;
     });
 }
 
+// Update remove button event listener
 const budgetList = document.getElementById('budget-list');
 if (budgetList) {
     budgetList.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-btn')) {
             const idx = e.target.getAttribute('data-idx');
-            const items = getBudgetItems();
+            const items = budgetStorage.getBudgetItems();
             items.splice(idx, 1);
-            saveBudgetItems(items);
+            budgetStorage.saveBudgetItems(items);
             renderBudget();
         }
     });
 }
 
+// Initialize the budget display
 renderBudget();
 
-// Export functions for use in other scripts
+// Export necessary functions
 export { setBudget, trackExpense };
 
