@@ -1,0 +1,13 @@
+{
+  "income": 4000,
+  "expectedExpenses": {
+    "rent": 1200,
+    "utilities": 200,
+    "groceries": 400,
+    "transportation": 150,
+    "insurance": 250,
+    "entertainment": 100,
+    "savings": 500,
+    "miscellaneous": 200
+  }
+}

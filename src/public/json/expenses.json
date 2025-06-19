@@ -1,0 +1,14 @@
+{
+  "2025-06": [
+    { "amount": 50, "category": "Food & Groceries", "date": "2025-06-05", "description": "Groceries" },
+    { "amount": 30, "category": "Transport", "date": "2025-06-10", "description": "Bus pass" }
+  ],
+  "2025-05": [
+    { "amount": 120, "category": "Utilities", "date": "2025-05-03", "description": "Electricity bill" },
+    { "amount": 60, "category": "Entertainment", "date": "2025-05-15", "description": "Movies" }
+  ],
+  "2025-04": [
+    { "amount": 100, "category": "Health", "date": "2025-04-12", "description": "Pharmacy" },
+    { "amount": 80, "category": "Shopping", "date": "2025-04-20", "description": "Clothes" }
+  ]
+}

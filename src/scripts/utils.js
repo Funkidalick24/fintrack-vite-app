@@ -7,7 +7,11 @@ export const storageKeys = {
 
 export const budgetStorage = {
     getBudget() {
-        return parseFloat(localStorage.getItem(storageKeys.BUDGET)) || 0;
+        // Assuming you store budget items as [{type: 'income'|'expense', amount: number, ...}]
+        const items = JSON.parse(localStorage.getItem('budgetItems')) || [];
+        return items
+            .filter(item => item.type === 'income')
+            .reduce((sum, item) => sum + Number(item.amount), 0);
     },
     
     setBudget(amount) {

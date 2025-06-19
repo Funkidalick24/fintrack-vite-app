@@ -111,6 +111,34 @@ if (budgetList) {
 // Initialize the budget display
 renderBudget();
 
+// Add this after renderBudget() and before export
+async function loadExampleBudget() {
+    const res = await fetch('/json/budget.json');
+    const data = await res.json();
+
+    // Add income
+    const items = [];
+    if (data.income) {
+        items.push({ type: 'income', amount: data.income, description: 'Example Income' });
+    }
+    // Add expected expenses
+    if (data.expectedExpenses) {
+        for (const [desc, amount] of Object.entries(data.expectedExpenses)) {
+            items.push({ type: 'expense', amount, description: desc.charAt(0).toUpperCase() + desc.slice(1) });
+        }
+    }
+    budgetStorage.saveBudgetItems(items);
+    renderBudget();
+}
+
+// Attach event listener after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('load-example-btn');
+    if (btn) {
+        btn.onclick = loadExampleBudget;
+    }
+});
+
 // Export necessary functions
 export { setBudget, trackExpense };
 

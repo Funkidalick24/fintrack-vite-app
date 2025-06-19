@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css?family=Poppins:700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+   
 </head>
 <body>
     <header>
@@ -21,6 +22,15 @@
         </nav>
     </header>
     <main>
+        <button id="showChartBtn" class="cta-btn">Show Expenses Chart</button>
+<button id="loadExampleExpensesBtn" class="cta-btn" style="margin-left:1rem;">Load Example Expenses</button>
+
+<div id="expensesChartModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span id="closeChartModal" class="close">&times;</span>
+    <canvas id="expensesChart"></canvas>
+  </div>
+</div>
         <section id="expense-form-section">
             <h2>Add Expense</h2>
             <form id="expense-form">
@@ -86,6 +96,7 @@
     <footer>
         <p>&copy; 2023 FinTrack. All rights reserved.</p>
     </footer>
+    
     <script type="module" src="scripts/expenses.js"></script>
 </body>
 </html>

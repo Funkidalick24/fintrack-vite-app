@@ -1,4 +1,5 @@
 import { budgetStorage, expenseStorage, dateUtils } from './utils.js';
+import Chart from 'chart.js/auto'; // Only if using npm and Vite
 
 // Remove the duplicate storage functions and use the imported ones instead
 function renderExpenses() {
@@ -65,7 +66,6 @@ document.getElementById('expense-form').addEventListener('submit', function(e) {
     const expenses = expenseStorage.getMonthlyExpenses(selectedMonth);
     expenses.push({ amount, category, date, description });
     expenseStorage.saveExpenses(selectedMonth, expenses);
-    
     renderExpenses();
     this.reset();
     document.getElementById('category').selectedIndex = 0;
@@ -95,11 +95,14 @@ function populateMonthDropdown() {
         const option = document.createElement('option');
         option.value = monthKey;
         option.textContent = monthName;
+        // Set current month as selected
+        if (monthKey === dateUtils.getCurrentMonthKey()) {
+            option.selected = true;
+        }
         monthSelect.appendChild(option);
     }
-
-    // Set current month as default
-    monthSelect.value = selectedMonth;
+    // Update selectedMonth variable to current month
+    selectedMonth = dateUtils.getCurrentMonthKey();
 }
 
 // Make sure this event listener is at the bottom of the file
@@ -108,10 +111,77 @@ document.addEventListener('DOMContentLoaded', () => {
     renderExpenses();
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').setAttribute('max', today);
+
+    document.getElementById('showChartBtn').onclick = function() {
+        // FIX: Gather all expenses from all months
+        const allExpensesObj = JSON.parse(localStorage.getItem('expenses')) || {};
+        // Flatten all expenses into a single array
+        const expenses = Object.values(allExpensesObj).flat();
+
+        const monthlyTotals = getMonthlyTotals(expenses);
+        const labels = Object.keys(monthlyTotals);
+        const data = Object.values(monthlyTotals);
+
+        document.getElementById('expensesChartModal').style.display = 'flex';
+
+        const ctx = document.getElementById('expensesChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Total Spending per Month',
+                    data,
+                    backgroundColor: '#2563eb'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    };
+
+    document.getElementById('closeChartModal').onclick = function() {
+        document.getElementById('expensesChartModal').style.display = 'none';
+    };
+
+    // When the month is changed
+    document.getElementById('month-select').addEventListener('change', (e) => {
+        selectedMonth = e.target.value;
+        renderExpenses();
+    });
+
+    const loadBtn = document.getElementById('loadExampleExpensesBtn');
+    if (loadBtn) {
+        loadBtn.onclick = loadExampleExpenses;
+    }
 });
 
-// Add month change event listener
-document.getElementById('month-select').addEventListener('change', (e) => {
-    selectedMonth = e.target.value;
+// Example: expenses = [{amount: 50, date: '2024-06-01', category: 'Food'}, ...]
+function getMonthlyTotals(expenses) {
+  const monthly = {};
+  expenses.forEach(exp => {
+    const month = exp.date.slice(0,7); // "YYYY-MM"
+    monthly[month] = (monthly[month] || 0) + Number(exp.amount);
+  });
+  return monthly;
+}
+
+let chartInstance = null;
+
+async function loadExampleExpenses() {
+    const res = await fetch('/json/expenses.json');
+    const data = await res.json();
+    // Save each month's expenses to localStorage
+    for (const [month, expenses] of Object.entries(data)) {
+        expenseStorage.saveExpenses(month, expenses);
+    }
+    // Optionally, reset to the latest month in the example
+    selectedMonth = Object.keys(data).sort().reverse()[0];
+    populateMonthDropdown();
     renderExpenses();
-});
+}
