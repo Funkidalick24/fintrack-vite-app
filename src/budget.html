@@ -21,7 +21,17 @@
         </nav>
     </header>
     <main>
-        <button type="button" id="load-example-btn" class="cta-btn" style="margin-left:1rem;">Load Example Budget</button>
+    <div class="budget-action-buttons">
+        <button type="button" id="load-example-btn" class="cta-btn">Load Example Budget</button>
+        <button type="button" id="showBudgetChartBtn" class="cta-btn">Show Budget Pie Chart</button>
+    </div>
+
+    <div id="budgetChartModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span id="closeBudgetChartModal" class="close">&times;</span>
+        <canvas id="budgetPieChart"></canvas>
+      </div>
+    </div>
         <section id="budget-form-section">
             <h2>Add Budget Item</h2>
             <form id="budget-form">
@@ -55,8 +65,9 @@
         </section>
     </main>
     <footer>
-        <p>&copy; 2023 FinTrack. All rights reserved.</p>
+        <p>&copy; 2025 FinTrack. All rights reserved.</p>
     </footer>
     <script type="module" src="scripts/budget.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>

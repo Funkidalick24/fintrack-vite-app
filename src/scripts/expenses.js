@@ -174,8 +174,14 @@ function getMonthlyTotals(expenses) {
 let chartInstance = null;
 
 async function loadExampleExpenses() {
-    const res = await fetch('/json/expenses.json');
-    const data = await res.json();
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) spinner.style.display = 'flex';
+
+    // Wait at least 1.5 seconds, even if fetch is fast
+    const fetchPromise = fetch('/json/expenses.json').then(res => res.json());
+    const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
+    const [data] = await Promise.all([fetchPromise, delayPromise]);
+
     // Save each month's expenses to localStorage
     for (const [month, expenses] of Object.entries(data)) {
         expenseStorage.saveExpenses(month, expenses);
@@ -184,4 +190,6 @@ async function loadExampleExpenses() {
     selectedMonth = Object.keys(data).sort().reverse()[0];
     populateMonthDropdown();
     renderExpenses();
+
+    if (spinner) spinner.style.display = 'none';
 }

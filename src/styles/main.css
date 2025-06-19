@@ -519,8 +519,132 @@ footer {
           font-size: 2rem;
           cursor: pointer;
         }
-/* Center the modal button */
-#showChartBtn {
-  display: block;
-  margin: 2rem auto 0 auto;
+
+.budget-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
+
+#budgetChartModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 320px;
+    max-width: 95vw;
+    background: #fff;
+    padding: 2rem 2rem 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+}
+
+#budgetChartModal .close {
+    align-self: flex-end;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+
+
+.expenses-action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+#expensesChartModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 320px;
+    max-width: 95vw;
+    background: #fff;
+    padding: 2rem 2rem 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+}
+
+#expensesChartModal .close {
+    align-self: flex-end;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+
+
+/* ----------- Page Fade Animation ----------- */
+body {
+    /* ...existing styles... */
+    animation: pageFadeIn 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes pageFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ----------- Modal Fade & Slide Animation ----------- */
+.modal[style*="display: flex"] {
+    animation: modalFadeIn 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+.modal-content {
+    animation: modalSlideUp 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes modalSlideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ----------- Button Hover Animation ----------- */
+.cta-btn {
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.cta-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 12px rgba(37,99,235,0.15);
+}
+
+/* ----------- Table Row Fade-in Animation ----------- */
+@keyframes rowFadeIn {
+    from { opacity: 0; transform: translateY(20px);}
+    to   { opacity: 1; transform: translateY(0);}
+}
+.budget-list-row,
+.expenses-list-row {
+    animation: rowFadeIn 0.4s;
+}
+
+/* ----------- Loading Spinner ----------- */
+#loading-spinner {
+    display: none; /* Show with JS when loading */
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(255,255,255,0.7);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+#loading-spinner .spinner {
+    border: 6px solid #e0e6ed;
+    border-top: 6px solid #2563eb;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+}
+

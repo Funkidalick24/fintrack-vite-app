@@ -139,6 +139,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+let budgetChartInstance = null;
+
+document.getElementById('showBudgetChartBtn').onclick = function() {
+    // Gather budget data
+    const items = budgetStorage.getBudgetItems ? budgetStorage.getBudgetItems() : JSON.parse(localStorage.getItem('budgetItems')) || [];
+    const income = items.filter(i => i.type === 'income').reduce((sum, i) => sum + Number(i.amount), 0);
+    const expenses = items.filter(i => i.type === 'expense');
+
+    // Prepare data for pie chart
+    const labels = expenses.map(e => e.description || 'Expense');
+    const data = expenses.map(e => Number(e.amount));
+    const backgroundColors = [
+        '#ef4444', '#f59e42', '#fbbf24', '#10b981', '#3b82f6', '#a78bfa', '#f472b6', '#6366f1', '#facc15'
+    ];
+
+    // Add the remaining income as "Unallocated"
+    const totalExpenses = data.reduce((a, b) => a + b, 0);
+    if (income - totalExpenses > 0) {
+        labels.push('Unallocated Income');
+        data.push(income - totalExpenses);
+        backgroundColors.push('#22c55e');
+    }
+
+    document.getElementById('budgetChartModal').style.display = 'flex';
+
+    const ctx = document.getElementById('budgetPieChart').getContext('2d');
+    if (budgetChartInstance) budgetChartInstance.destroy();
+    budgetChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: backgroundColors
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+};
+
+document.getElementById('closeBudgetChartModal').onclick = function() {
+    document.getElementById('budgetChartModal').style.display = 'none';
+};
+
 // Export necessary functions
 export { setBudget, trackExpense };
 
